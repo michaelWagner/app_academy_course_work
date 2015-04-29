@@ -7,9 +7,10 @@ class Tile
   attr_reader :bombed, :revealed
   attr_accessor :flagged
 
-  def initialize(board, bombed, coordinates)
+  def initialize(board, coordinates, bombed)
     @board = board
     @bombed = bombed
+    p @bombed
     @revealed = false
     @flagged = false
     @coordinates = coordinates
@@ -47,7 +48,7 @@ class Tile
     neighbor_bomb_count = 0
     neighbors.each do |tile|
       this_tile = @board.minesweeper_board[tile[0]][tile[1]]
-      neighbor_bomb_count += 1 if this_tile.bombed == 1
+      neighbor_bomb_count += 1 if this_tile.bombed
     end
     neighbor_bomb_count
   end

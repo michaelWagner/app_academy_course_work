@@ -62,14 +62,14 @@ class Game
     @board.minesweeper_board.each_index do |y|
       @board.minesweeper_board.each_index do |x|
         tile = @board.minesweeper_board[y][x]
-        if tile.bombed == 1 && tile.revealed
+        if tile.bombed && tile.revealed
           puts "You lose"
           @board.display
           @board = Board.new(@grid_size)
           return true
         elsif tile.revealed == false && tile.flagged == false
           unrevealed = true
-        elsif tile.flagged == true && tile.bombed == 1
+        elsif tile.flagged == true && tile.bombed == true
           flag_count += 1
         end
       end
@@ -78,6 +78,7 @@ class Game
       return false
     elsif flag_count == @board.total_bomb_count
       puts "you win!"
+      @board.display
       return true
     end
   end
@@ -109,13 +110,13 @@ class Game
   end
 
   def save(choice)
-    puts "Enter a filename: "
+    if choice == "q"
+      exit
+    end
+    puts "Enter a filename or q"
     filename = gets.chomp
     File.open(filename, 'w') do |f|
       f.puts self.to_yaml
-    end
-    if choice == "q"
-      exit
     end
   end
 
