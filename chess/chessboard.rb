@@ -12,7 +12,6 @@ class ChessBoard
 
   def create_board
     Array.new(8) { Array.new(8) }
-
   end
 
   def fill_board
@@ -44,7 +43,7 @@ class ChessBoard
         if tile.nil?
           print "  * "
         else
-          print "  #{tile.unicode_sym} "
+          print "  #{tile.symbol} "
         end
       end
       print "\n\n"
@@ -64,7 +63,7 @@ class ChessBoard
       row.each do |tile|
         if !tile.nil?
           piece = tile
-          puts piece
+          # puts piece
           enemy_king = current_kings.reject { |king| king.color == piece.color }[0]
           if piece.valid_moves.include?(enemy_king)
             return true
@@ -99,19 +98,22 @@ class ChessBoard
   def move(starting_position, ending_position)
     piece = self[starting_position[0], starting_position[1]]
     raise NoPieceError if piece.nil?
+
     # check if pieces can move onto enemy piece or nil
+
     # raise InvalidMoveError if !@board[ending].nil?
+
     # piece.valids_moves.each do |move|
 
     test_board = board_copy(@board)
     test_board[piece.position[0], piece.position[1]] = nil
     piece.position = ending_position
     test_board[piece.position[0], piece.position[1]] = piece
-    raise InvalidMoveError if test_board.in_check?
+    # raise InvalidMoveError if test_board.in_check?
 
-    @board[piece.position] = nil
+    @board[piece.position[0], piece.position[1]] = nil
     piece.position = ending_position
-    @board[piece.position] = piece
+    @board[piece.position[0], piece.position[1]] = piece
 
   end
 

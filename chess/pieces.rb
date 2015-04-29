@@ -18,6 +18,7 @@ module Slideable
 
     possible_moves
   end
+end
 
 
 
@@ -32,7 +33,6 @@ module Slideable
   #
   # end
 
-end
 
 module Stepable
   def stepping_moves(delta, position, board)
@@ -74,7 +74,7 @@ class Piece
   end
 
   def inspect
-    puts "#{@unicode_sym} at position: #{@position}"
+    puts "#{self.symbol} at position: #{@position}"
   end
 
   def moves
@@ -84,7 +84,7 @@ class Piece
   def valid_moves
     filtered_moves = []
     moves.each do |pos|
-      filtered_moves << pos unless #move_into_check?(pos)
+      filtered_moves << pos #unless #move_into_check?(pos)
     end
   end
 
@@ -127,15 +127,22 @@ class Bishop < SlidingPiece
     @color == "black" ? "\u265D" : "\u2657"
   end
 
-  # def move_into_check?(pos)
-  #   check_board = ChessBoard.new
-  #   check_board.board = board_copy(@board)
-  #   check_board[@position[0], @position[1]] = nil
-  #   @position = pos
-  #   check_board[pos[0], pos[1]] = self
-  #
-  #   check_board.in_check?
-  # end
+  def move_into_check?(pos)
+    check_board = ChessBoard.new
+    check_board.board = board_copy(@board)
+    # current position of piece before move
+    check_piece = check_board[@position[0], @position[1]]
+    # move to new position
+    check_piece.position = pos
+    # Position is empty after move
+    check_board[@position[0], @position[1]] = nil
+
+    # @position = pos
+
+    check_board[pos[0], pos[1]] = check_piece
+
+    check_board.in_check?
+  end
 
   def directions
     [[-1, -1], [-1, 1], [1, -1], [1, 1]]
