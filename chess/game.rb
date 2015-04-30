@@ -1,8 +1,4 @@
 require_relative "chessboard"
-require_relative "pieces"
-
-# class InvalidMoveError < StandardError
-# end
 
 class Game
 
@@ -10,20 +6,21 @@ class Game
     @white, @black = white, black
     @game = ChessBoard.new
     @current_player = @white
+
   end
 
   def play
     until @game.checkmate?(@current_player.color)
-      @game.display
 
       begin
+        system "clear"
+        @game.display
+        puts "#{@current_player.color}'s turn"
         user_from, user_to = @current_player.play_turn
         if validate_input(user_from, user_to)
 
           @game.move(user_from, user_to)
-          p @current_player
           @current_player = [@white, @black].reject {|c| c == @current_player }[0]
-          p @current_player
         else
           raise InvalidMoveError
         end
@@ -36,6 +33,9 @@ class Game
     puts "#{current_player} loses."
   end
 
+# split into 2 types of validations
+# color
+# nil
   def validate_input(user_from, user_to)
     unless @game[user_from].color != @current_player.color || @game[user_from].nil?
       # raise InvalidMoveError
