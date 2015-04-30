@@ -11,21 +11,18 @@ class Game
 
   def play
     until @game.checkmate?(@current_player.color)
-
       begin
         system "clear"
         @game.display
         puts "#{@current_player.color}'s turn"
         user_from, user_to = @current_player.play_turn
-        if validate_input(user_from, user_to)
-
+        if valid_input?(user_from, user_to)
           @game.move(user_from, user_to)
           @current_player = [@white, @black].reject {|c| c == @current_player }[0]
         else
           raise InvalidMoveError
         end
       rescue
-        puts "That's an invalid move, please try again: "
         retry
       end
     end
@@ -33,33 +30,45 @@ class Game
     puts "#{current_player} loses."
   end
 
-# split into 2 types of validations
-# color
-# nil
-  def validate_input(user_from, user_to)
-    unless @game[user_from].color != @current_player.color || @game[user_from].nil?
-      # raise InvalidMoveError
-    # end
-  # rescue InvalidMoveError => e
-  #   puts "That was an invalid move."
-  #   puts "#{e.message}"
-
+  def valid_color?(from_pos)
+    unless from_pos.color != @current_player.color
+      puts "This piece is not your color, please select again."
       return false
     end
 
-    return true
+    true
+  end
+
+  def valid_input?(user_from, user_to)
+    if valid_position?(@game[user_from]) && valid_color?(@game[user_from])
+      return true
+    end
+
+    false
+  end
+
+  def valid_position?(from_pos)
+    if from_pos.nil?
+      puts "No player at position #{from_pos} to move."
+      return false
+    end
+
+    true
   end
 end
 
 
 class Player
   attr_reader :color
+
   def initialize(color)
     @color = color
   end
 end
 
+
 class HumanPlayer < Player
+
   def initialize(color)
     super
   end
@@ -76,6 +85,7 @@ end
 
 
 if __FILE__ == $PROGRAM_NAME
+
   p1 = HumanPlayer.new(:white)
   p2 = HumanPlayer.new(:black)
   new_game = Game.new(p1, p2)
