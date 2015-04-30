@@ -1,5 +1,5 @@
-require_relative 'Tile'
-require_relative 'Game'
+require_relative 'tile'
+require_relative 'game'
 
 class Board
   MAX_MINES =  5 # (9 * 9) / 3
@@ -19,12 +19,13 @@ class Board
       minesweeper_board.each_index do |x|
         if @total_bomb_count < MAX_MINES
           bombed = [false, true].sample
-          p bombed
+          # p bombed
           if bombed == true
             @total_bomb_count += 1
           end
         end
         minesweeper_board[y][x] = Tile.new(self, [y,x], bombed)
+        bombed = false
       end
     end
     puts @total_bomb_count

@@ -1,5 +1,5 @@
-require_relative 'Board'
-require_relative 'Tile'
+require_relative 'board'
+require_relative 'tile'
 require 'yaml'
 
 class Game
@@ -25,6 +25,7 @@ class Game
   def play
     game_over = false
     until game_over
+      # system "clear"
       puts "Current board: "
       @board.display
       input = get_input
@@ -34,10 +35,8 @@ class Game
   end
 
   def get_input
-    puts "\"r\" chooses to reveal a tile"
-    puts "\"f\" chooses to flag a tile"
-    puts "\"save\" to save game"
-    puts "q to quit"
+    puts "\"r\" chooses to reveal a tile, \"f\" chooses to flag a tile"
+    puts "\"save\" to save game or \"q\" to quit"
     choice = "hi"
     until valid_input?(choice)
       puts "Enter in the format of: r y,x"
