@@ -1,5 +1,5 @@
 module Slideable
-  def sliding_moves(delta, position, board)
+  def sliding_moves(delta, position)
     x, y = position
     possible_moves = []
 
@@ -10,7 +10,11 @@ module Slideable
       until !temp_x.between?(0, 7) || !temp_y.between?(0,7)
         check_x, check_y = [temp_x + shift_x, temp_y + shift_y]
         if check_x.between?(0,7) && check_y.between?(0,7)
-          possible_moves << [check_x, check_y]
+          if team_collision([check_x, check_y])
+            break
+          else
+            possible_moves << [check_x, check_y]
+          end
         end
         temp_x, temp_y = [check_x, check_y]
       end
@@ -18,24 +22,10 @@ module Slideable
 
     possible_moves
   end
-
-
-
-
-
-  # def valid_move?(end_position, board, position)
-  #   # x, y = end_position
-  #   # return false if x.between?(0, 7) || y.between?(0,7)
-  #   return true if @board[end_position].nil?
-  #   return false if @board[end_position].color == @board[position].color
-  #   return true
-  #
-  # end
-
 end
 
 module Stepable
-  def stepping_moves(delta, position, board)
+  def stepping_moves(delta, position)
     x, y = position
     possible_moves = []
 
@@ -45,7 +35,9 @@ module Stepable
       check_x, check_y = [temp_x + shift_x, temp_y + shift_y]
 
       if check_x.between?(0,7) && check_y.between?(0,7)
-        possible_moves << [check_x, check_y]
+        unless team_collision([check_x, check_y])
+          possible_moves << [check_x, check_y]
+        end
       end
     end
 
@@ -56,7 +48,7 @@ module Stepable
 end
 
 class Piece
-  attr_reader :unicode_sym, :color
+  attr_reader :color, :board
   attr_accessor :position, :moved
 
   def initialize(board, position, color, moved = false)
@@ -64,32 +56,38 @@ class Piece
     @position = position
     @color = color
     @moved = moved
-    # @unicode_sym = nil
   end
 
-  def board_copy(board)
-    board.inject([]) do |board, tile|
-      board << (tile.is_a?(Array) ? board_copy(tile) : tile)
-    end
+  def dup(board)
+    self.class.new(board, @position.dup, @color)
   end
 
   def inspect
-    puts "#{@unicode_sym} at position: #{@position}"
+    symbol
   end
 
-  def moves
-    directions
-  end
+  def move_into_check?(ending_position)
+    dup_board = @board.board_dup
+    starting_position = @position.dup
 
-  def valid_moves
-    filtered_moves = []
-    moves.each do |pos|
-      filtered_moves << pos unless #move_into_check?(pos)
-    end
+    # check the move
+    dup_board.move!(starting_position, ending_position)
+    #
+    # from = dup_board[starting_position]
+    # dup_board[ending_position] = from
+    # dup_board[starting_position] = nil
+
+    dup_board.in_check?(@color)
   end
 
   def team_collision(pos)
-    @board[pos[0], pos[1]] == @color
+    unless @board[pos].nil?
+      @board[pos].color == @color
+    end
+  end
+
+  def valid_moves
+    moves.reject { |move| move_into_check?(move) }
   end
 
 end
@@ -102,7 +100,7 @@ class SlidingPiece < Piece
 
   def moves
     delta = directions
-    sliding_moves(delta, @position, @board)
+    sliding_moves(delta, @position)
   end
 end
 
@@ -114,7 +112,7 @@ class SteppingPiece < Piece
 
   def moves
     delta = directions
-    stepping_moves(delta, @position, @board)
+    stepping_moves(delta, @position)
   end
 end
 
@@ -127,15 +125,6 @@ class Bishop < SlidingPiece
     @color == "black" ? "\u265D" : "\u2657"
   end
 
-  # def move_into_check?(pos)
-  #   check_board = ChessBoard.new
-  #   check_board.board = board_copy(@board)
-  #   check_board[@position[0], @position[1]] = nil
-  #   @position = pos
-  #   check_board[pos[0], pos[1]] = self
-  #
-  #   check_board.in_check?
-  # end
 
   def directions
     [[-1, -1], [-1, 1], [1, -1], [1, 1]]
@@ -203,12 +192,51 @@ class King < SteppingPiece
 
 end
 
-class Pawn < Piece
+class Pawn < SteppingPiece
   def initialize(board, position, color, moved = false)
     super
   end
 
-  def valid_moves
+  # refactor
+  def directions
+    x, y = @position
+    if @color == :black
+      valid_directions = [[1, 0]]
+      unless @moved
+        valid_directions << [2, 0]
+      end
+
+      [[1, -1], [1, 1]].each do |temp_x, temp_y|
+        check_x, check_y = x + temp_x, y + temp_y
+        if check_x.between?(0, 7) && check_y.between?(0, 7)
+          if @board[[check_x, check_y]].is_a?(Piece)
+            unless @board[[check_x, check_y]].color == @color
+              valid_directions << [temp_x, temp_y]
+            end
+          end
+        end
+      end
+
+    else
+      valid_directions = [[-1, 0]]
+      unless @moved
+        valid_directions << [-2, 0]
+      end
+
+      [[-1, -1], [-1, 1]].each do |temp_x, temp_y|
+        check_x, check_y = x + temp_x, y + temp_y
+        if check_x.between?(0, 7) && check_y.between?(0, 7)
+          if @board[[check_x, check_y]].is_a?(Piece)
+            unless @board[[check_x, check_y]].color == @color
+              valid_directions << [temp_x, temp_y]
+            end
+          end
+        end
+      end
+
+    end
+
+    valid_directions
   end
 
   def symbol
