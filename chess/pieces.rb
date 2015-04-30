@@ -1,4 +1,5 @@
 module Slideable
+
   def sliding_moves(delta, position)
     x, y = position
     possible_moves = []
@@ -25,6 +26,7 @@ module Slideable
 end
 
 module Stepable
+
   def stepping_moves(delta, position)
     x, y = position
     possible_moves = []
@@ -94,6 +96,7 @@ end
 
 class SlidingPiece < Piece
   include Slideable
+
   def initialize(board, position, color, moved = false)
     super
   end
@@ -106,6 +109,7 @@ end
 
 class SteppingPiece < Piece
   include Stepable
+
   def initialize(board, position, color, moved = false)
     super
   end
@@ -117,6 +121,7 @@ class SteppingPiece < Piece
 end
 
 class Bishop < SlidingPiece
+
   def initialize(board, position, color, moved = false)
     super
   end
@@ -133,6 +138,7 @@ class Bishop < SlidingPiece
 end
 
 class Rook < SlidingPiece
+
   def initialize(board, position, color, moved = false)
     super
   end
@@ -147,6 +153,7 @@ class Rook < SlidingPiece
 end
 
 class Queen < SlidingPiece
+
   def initialize(board, position, color, moved = false)
     super
   end
@@ -161,6 +168,7 @@ class Queen < SlidingPiece
 end
 
 class Knight < SteppingPiece
+
   def initialize(board, position, color, moved = false)
     super
   end
@@ -177,6 +185,7 @@ class Knight < SteppingPiece
 end
 
 class King < SteppingPiece
+
   def initialize(board, position, color, moved = false)
     super
   end
@@ -193,6 +202,7 @@ class King < SteppingPiece
 end
 
 class Pawn < SteppingPiece
+  
   def initialize(board, position, color, moved = false)
     super
   end

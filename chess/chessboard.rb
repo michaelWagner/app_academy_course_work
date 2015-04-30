@@ -1,8 +1,6 @@
 require_relative 'pieces'
 require 'colorize'
 
-class InvalidMoveError < StandardError
-end
 
 class ChessBoard
   PIECE_ORDER = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
@@ -56,6 +54,7 @@ class ChessBoard
         self[[6, i]]=  Pawn.new(self, [6, i], :white)
       end
 
+      # Fill all other pieces
       PIECE_ORDER.each_with_index do |piece, i|
         [[0, :black], [7, :white]].each do |row_number, color|
           self[[row_number, i]] = piece.new(self, [row_number, i], color)
@@ -71,12 +70,12 @@ class ChessBoard
     (0..7).each do |row|
       print " #{row + 1}  ".colorize(:color => :black, :background => :white)
       (0..7).each do |col|
-        unless (row+col) % 2 == 0 #|| col % 2 == 0
+        unless (row + col) % 2 == 0
           tile = self[[row, col]]
           if tile.nil?
-            print "      "#.colorize(:background => :none)
+            print "      "
           else
-            print "  #{tile.symbol}   "#.colorize(:background => :none)
+            print "  #{tile.symbol}   "
           end
         else
           tile = self[[row, col]]
@@ -164,12 +163,14 @@ class ChessBoard
   end
 end
 
+class InvalidMoveError < StandardError
+  puts "That's an invalid move, please try again: "
+end
 
 if __FILE__ == $PROGRAM_NAME
   c = ChessBoard.new
 
   # Quick checkmate
-
 
   c.move([1, 4], [2, 4])
   c.move([1, 5], [3, 5])
@@ -180,10 +181,6 @@ if __FILE__ == $PROGRAM_NAME
   # c.move([1, 1], [2, 1])
   # c.move([0, 1], [5, 0])
   # c.move([0, 1], [2, 2])
-  # p c[[2, 1]].moves
   # c.move([1, 3], [3, 3])
 
-  # c.move([0,1], [2,2])
-  # p1 = Rook.new(x, [0,0], :white)
-  # p p1.move_into_
 end
