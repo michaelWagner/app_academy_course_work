@@ -65,16 +65,22 @@ end
 if __FILE__ == $PROGRAM_NAME
   c = CheckerBoard.new
   system 'clear'
-  c.render
-  p1 = c[[0, 1]]
-
-  p1.perform_slide([0, 2])
-
+  # c.render
+  p1 = c[[3, 2]]
+  p1.perform_slide([4, 3])
   c.render
 
-  p2 = c[[0, 3]]
-
-  p2.perform_jump([4, 2])
-  
+  p2 = c[[6, 1]]
+  p2.perform_slide([5, 2])
   c.render
+
+  p1.perform_jump([6, 1])
+  c.render
+
+
+  # p2 = c[[0, 3]]
+  #
+  # p2.perform_jump([4, 2])
+  #
+  # c.render
 end
