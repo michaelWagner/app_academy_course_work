@@ -1,5 +1,5 @@
 require_relative 'pieces'
-require 'byebug'
+require 'colorize'
 
 class InvalidMoveError < StandardError
 end
@@ -61,7 +61,6 @@ class ChessBoard
           self[[row_number, i]] = piece.new(self, [row_number, i], color)
         end
       end
-      # nil
     end
   end
 
@@ -70,17 +69,38 @@ class ChessBoard
     print "\n"
     (0..7).each do |row|
       (0..7).each do |col|
-        tile = self[[row, col]]
-        if tile.nil?
-          print "  * "
+        unless (row+col) % 2 == 0 #|| col % 2 == 0
+          tile = self[[row, col]]
+          if tile.nil?
+            print "      "#.colorize(:background => :none)
+          else
+            print "  #{tile.symbol}   "#.colorize(:background => :none)
+          end
         else
-          print "  #{tile.symbol} "
+          tile = self[[row, col]]
+          if tile.nil?
+            print "      ".colorize(:background => :blue)
+          else
+            print "  #{tile.symbol}   ".colorize(:background => :blue)
+          end
         end
       end
-      print "\n\n"
+      print "\n"
     end
+    # colorize_board
     nil
   end
+
+  # def colorize_board
+  #   (0..7).each do |row|
+  #     (0..7).each do |col|
+  #       tile = self[[row, col]]
+  #       if row % 2 == 0
+  #         self[[row,col]].colorize(:background => :red)
+  #       end
+  #     end
+  #   end
+  # end
 
   def pieces(color)
     all_pieces.select { |piece| piece.color == color }
@@ -128,7 +148,6 @@ class ChessBoard
   end
 
   def move(starting_position, ending_position)
-    # debugger
     piece = self[starting_position]
     raise NoPieceError if piece.nil?
 
@@ -146,7 +165,6 @@ class ChessBoard
   end
 
   def move!(starting_position, ending_position)
-    # test_board = board_dup
     from = self[starting_position]
     self[ending_position] = from
     self[starting_position] = nil
