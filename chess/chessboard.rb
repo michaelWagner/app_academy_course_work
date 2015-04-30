@@ -1,78 +1,127 @@
 require_relative 'pieces'
+require 'colorize'
+
+class InvalidMoveError < StandardError
+end
 
 class ChessBoard
-  PIECE_ORDER = [Rook, Knight, Bishop, King, Queen, Bishop, Knight, Rook]
+  PIECE_ORDER = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
   attr_accessor :board
 
-  def initialize
+  def initialize(fill_pieces = true)
     @board = create_board
+    @fill_pieces = fill_pieces
     fill_board
-    @white_turn = true
+  end
+
+  def all_pieces
+    @board.flatten.compact
+  end
+
+  def board_dup
+    dup_board = ChessBoard.new(false)
+    all_pieces.each do |piece|
+      dup_piece = piece.dup(dup_board)
+      dup_board[dup_piece.position] = dup_piece
+    end
+
+    dup_board
+  end
+
+  def checkmate?(color)
+    checkmate = false
+    if self.in_check?(color)
+      pieces(color).all? do |piece|
+        piece.valid_moves.count == 0
+        checkmate = true
+      end
+    end
+
+    checkmate
   end
 
   def create_board
     Array.new(8) { Array.new(8) }
-
   end
 
   def fill_board
-    # Fill black pawns
-    @board[1].each_with_index do |tile, i|
-      @board[1][i] =  Pawn.new(@board, [1, i], "black")
-    end
+    if @fill_pieces == true
+      # Fill black pawns
+      @board[1].each_with_index do |tile, i|
+        self[[1, i]] =  Pawn.new(self, [1, i], :black)
+      end
 
-    # Fill white pawns
-    @board[6].each_with_index do |tile, i|
-      @board[6][i] =  Pawn.new(@board, [6, i], "white")
-    end
+      # Fill white pawns
+      @board[6].each_with_index do |tile, i|
+        self[[6, i]]=  Pawn.new(self, [6, i], :white)
+      end
 
-    PIECE_ORDER.each_with_index do |piece, i|
-      [[0, "black"], [7, "white"]].each do |row_number, color|
-        # attributes = [@board, [row_number, i], color]
-        @board[row_number][i] = piece.new(@board, [row_number, i], color)
+      PIECE_ORDER.each_with_index do |piece, i|
+        [[0, :black], [7, :white]].each do |row_number, color|
+          self[[row_number, i]] = piece.new(self, [row_number, i], color)
+        end
       end
     end
-    nil
-    display
   end
+
 
   def display
     print "\n"
     (0..7).each do |row|
       (0..7).each do |col|
-        tile = @board[row][col]
-        if tile.nil?
-          print "  * "
+        unless (row+col) % 2 == 0 #|| col % 2 == 0
+          tile = self[[row, col]]
+          if tile.nil?
+            print "      "#.colorize(:background => :none)
+          else
+            print "  #{tile.symbol}   "#.colorize(:background => :none)
+          end
         else
-          print "  #{tile.unicode_sym} "
-        end
-      end
-      print "\n\n"
-    end
-    nil
-  end
-
-    # @board.each do |row|
-    #   puts row
-    # end
-  # end
-
-  # refactor
-  def in_check?
-    current_kings = find_kings
-    self.board.each do |row|
-      row.each do |tile|
-        if !tile.nil?
-          piece = tile
-          puts piece
-          enemy_king = current_kings.reject { |king| king.color == piece.color }[0]
-          if piece.valid_moves.include?(enemy_king)
-            return true
+          tile = self[[row, col]]
+          if tile.nil?
+            print "      ".colorize(:background => :blue)
+          else
+            print "  #{tile.symbol}   ".colorize(:background => :blue)
           end
         end
       end
+      print "\n"
     end
+    # colorize_board
+    nil
+  end
+
+  # def colorize_board
+  #   (0..7).each do |row|
+  #     (0..7).each do |col|
+  #       tile = self[[row, col]]
+  #       if row % 2 == 0
+  #         self[[row,col]].colorize(:background => :red)
+  #       end
+  #     end
+  #   end
+  # end
+
+  def pieces(color)
+    all_pieces.select { |piece| piece.color == color }
+  end
+
+  def in_check?(color)
+    enemy_color = [:white, :black].reject {|c| c == color }[0]
+    our_king = king(color)
+    pieces(enemy_color).each do |piece|
+      piece.moves.each do |move|
+        if move == our_king.position
+          return true
+        end
+      end
+    end
+
     return false
+  end
+
+  def king(color)
+    pieces(color).find { |piece| piece.is_a?(King) }
   end
 
   def find_kings
@@ -88,51 +137,61 @@ class ChessBoard
     kings
   end
 
-  def [](row, col)
-    @board[row][col]
+  def [](pos)
+    row, col = pos
+    self.board[row][col]
   end
 
-  def []=(row, col, ending)
-    @board[row][col] = ending
+  def []=(pos, value)
+    row, col = pos
+    self.board[row][col] = value
   end
 
   def move(starting_position, ending_position)
-    piece = self[starting_position[0], starting_position[1]]
+    piece = self[starting_position]
     raise NoPieceError if piece.nil?
-    # check if pieces can move onto enemy piece or nil
-    # raise InvalidMoveError if !@board[ending].nil?
-    # piece.valids_moves.each do |move|
 
-    test_board = board_copy(@board)
-    test_board[piece.position[0], piece.position[1]] = nil
-    piece.position = ending_position
-    test_board[piece.position[0], piece.position[1]] = piece
-    raise InvalidMoveError if test_board.in_check?
-
-    @board[piece.position] = nil
-    piece.position = ending_position
-    @board[piece.position] = piece
-
-  end
-
-  def board_copy(board)
-    board.inject([]) do |board, tile|
-      board << (tile.is_a?(Array) ? board_copy(tile) : tile)
+    if piece.valid_moves.include?(ending_position)
+      piece.position = ending_position
+      self[starting_position] = nil
+      self[ending_position] = piece
+      piece.moved = true
+      display
+    else
+      # catch in game.rb
+      raise InvalidMoveError
     end
+    display
   end
 
-
-# AI Territory
-  # black is in check
-  # black's turn
-  # able_to_move = [black's king]
-  # iterate through black's pieces and see if any
-  # to cross the valids_moves of  the white attacker
-  # if so add to able_to_move
-
+  def move!(starting_position, ending_position)
+    from = self[starting_position]
+    self[ending_position] = from
+    self[starting_position] = nil
+    self[ending_position].position = ending_position
+  end
 end
 
-#
-# c = ChessBoard.new
 
-# c.display
+if __FILE__ == $PROGRAM_NAME
+  c = ChessBoard.new
+
+  # Quick checkmate
+
+
+  c.move([1, 4], [2, 4])
+  c.move([1, 5], [3, 5])
+  c.move([6, 4], [4, 4])
+  c.move([7, 3], [3, 7])
+  p c.checkmate?(:black)
+
+  # c.move([1, 1], [2, 1])
+  # c.move([0, 1], [5, 0])
+  # c.move([0, 1], [2, 2])
+  # p c[[2, 1]].moves
+  # c.move([1, 3], [3, 3])
+
+  # c.move([0,1], [2,2])
+  # p1 = Rook.new(x, [0,0], :white)
+  # p p1.move_into_
+end
