@@ -1,5 +1,5 @@
-require_relative 'Board'
-require_relative 'Game'
+require_relative 'board'
+require_relative 'game'
 
 class Tile
   NEIGHBORS = [[0, 1], [0, -1], [1, 0], [-1, 0],
