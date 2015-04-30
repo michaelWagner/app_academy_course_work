@@ -66,8 +66,10 @@ class ChessBoard
 
 
   def display
-    print "\n"
+    print "      #{("A".."H").to_a.join('     ')}       \n"
+    .colorize(:color => :black, :background => :white)
     (0..7).each do |row|
+      print " #{row + 1}  ".colorize(:color => :black, :background => :white)
       (0..7).each do |col|
         unless (row+col) % 2 == 0 #|| col % 2 == 0
           tile = self[[row, col]]
@@ -85,22 +87,12 @@ class ChessBoard
           end
         end
       end
-      print "\n"
+      print "    \n".colorize(:background => :white)
     end
-    # colorize_board
+    print "#{'           ' * 5} \n".colorize(:background => :white)
+
     nil
   end
-
-  # def colorize_board
-  #   (0..7).each do |row|
-  #     (0..7).each do |col|
-  #       tile = self[[row, col]]
-  #       if row % 2 == 0
-  #         self[[row,col]].colorize(:background => :red)
-  #       end
-  #     end
-  #   end
-  # end
 
   def pieces(color)
     all_pieces.select { |piece| piece.color == color }
