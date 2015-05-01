@@ -1,9 +1,11 @@
 require_relative 'piece'
 
 class CheckerBoard
+  attr_accessor :cursor
   attr_reader :board
 
   def initialize #board = false)
+    @cursor = [0, 0]
     @board = create_board #unless board
     fill_board
     render
@@ -65,22 +67,70 @@ end
 if __FILE__ == $PROGRAM_NAME
   c = CheckerBoard.new
   system 'clear'
-  # c.render
-  p1 = c[[3, 2]]
-  p1.perform_slide([4, 3])
+  # [up/down, left/right]
+
+  r1 = c[[3, 2]]
+  r1.perform_slide([4, 3])
   c.render
 
-  p2 = c[[6, 1]]
-  p2.perform_slide([5, 2])
+  w2 = c[[6, 1]]
+  w2.perform_slide([5, 2])
   c.render
 
-  p1.perform_jump([6, 1])
+  r1.perform_jump([6, 1])
   c.render
 
+  w3 = c[[7, 0]]
+  w3.perform_jump([5, 2])
+  c.render
 
-  # p2 = c[[0, 3]]
-  #
-  # p2.perform_jump([4, 2])
-  #
-  # c.render
+  w4 = c[[6, 3]]
+  w4.perform_slide([5, 4])
+  c.render
+
+  r5 = c[[3, 4]]
+  r5.perform_slide([4, 5])
+  c.render
+
+  r5.perform_jump([6, 3])
+  c.render
+
+  w6 = c[[7, 2]]
+  w6.perform_jump([5, 4])
+  c.render
+
+  w8 = c[[8, 1]]
+  w8.perform_slide([7, 2])
+  c.render
+
+  w9 = c[[9, 2]]
+  w9.perform_slide([8, 1])
+  c.render
+
+  w9.perform_slide([7, 0])
+  c.render
+
+  r10 = c[[3, 6]]
+  r10.perform_slide([4, 5])
+  c.render
+
+  r10.perform_jump([6, 3])
+  c.render
+
+  r10.perform_jump([8, 1])
+  c.render
+
+  r10.perform_slide([9, 2])
+  c.render
+
+  w11 = c[[7, 4]]
+  w11.perform_slide([6, 3])
+  c.render
+
+  r10.perform_jump([7, 4])
+  c.render
+
+  r10.perform_slide([8, 3])
+  c.render
+
 end
