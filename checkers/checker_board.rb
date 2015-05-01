@@ -2,11 +2,13 @@ require_relative 'piece'
 
 class CheckerBoard
   attr_accessor :cursor
-  attr_reader :board
+  attr_reader :board, :white_pieces, :red_pieces
 
   def initialize #board = false)
     @cursor = [0, 0]
     @board = create_board #unless board
+    @white_pieces = []
+    @red_pieces = []
     fill_board
     render
   end
@@ -32,10 +34,19 @@ class CheckerBoard
           color = row < 5 ? :red : :white
           if (row + col) % 2 != 0
             self[[row, col]] = Piece.new([row, col], color, self)
+            if self[[row, col]].color == :white
+              self.white_pieces << self[[row, col]]
+            else
+              self.red_pieces << self[[row, col]]
+            end
           end
         end
       end
     end
+  end
+
+  def pieces(color)
+    color == :red ? @red_pieces : @white_pieces
   end
 
   def render
