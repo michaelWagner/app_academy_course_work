@@ -3,7 +3,7 @@ require 'colorize'
 require 'byebug'
 
 class Piece
-  attr_reader :color, :position
+  attr_reader :color, :position, :king
 
   def initialize(position, color, board)
     @position = position
@@ -13,36 +13,42 @@ class Piece
   end
 
   def maybe_promote
+    if color == :white && @position[0] == 0
+      @king = true
+    elsif @position[0] == 9
+      @king = true
+    end
   end
 
   def move!(move_to)
     @board[move_to] = self
     @board[@position] = nil
     @position = move_to
+    maybe_promote
   end
 
   def move_jump_diffs
-    if @color == :red
-      [[2, 2], [2, -2]]
-    elsif @king
+    if @king
       [[2, 2], [2, -2], [-2, 2], [-2, -2]]
+    elsif @color == :red
+      [[2, 2], [2, -2]]
     else
       [[-2, 2], [-2, -2]]
     end
   end
 
   def move_slide_diffs
-    if @color == :red
-      [[1, 1], [1, -1]]
-    elsif @king
+    if @king
       [[1, 1], [1, -1], [-1, 1], [-1, -1]]
+    elsif @color == :red
+      [[1, 1], [1, -1]]
     else
       [[-1, 1], [-1, -1]]
     end
   end
 
   def perform_slide(slide_to)
-    if valid_move?(slide_to)
+    if possible_slides.include?(slide_to)
       move!(slide_to)
     else
       raise "Invalid Slide"
@@ -50,49 +56,58 @@ class Piece
   end
 
   def perform_jump(jump_to)
-    if valid_move?(jump_to)
+    if possible_jumps.include?(jump_to)
       remove_jumped_piece(@position, jump_to)
       move!(jump_to)
-      # remove jumped piece
     else
       raise "Invalid Jump"
     end
   end
 
+  def possible_jumps
+    moves = []
+    move_jump_diffs.each do |jump_diff|
+      x, y = [@position.first + jump_diff.first, @position.last + jump_diff.last]
+      jump_move = [x, y]
 
-  def possible_moves(pos)
+      p jump_move
+
+      if (x.between?(0, 10) && y.between?(0, 9)) && @board[jump_move].nil?
+        moves << jump_move
+      end
+    end
+    p "Possible jumps for #{@position}: "
+    p "#{moves.uniq}"
+
+    moves.uniq
+  end
+
+  def possible_slides
     moves = []
 
     move_slide_diffs.each do |slide_diff|
-      slide_move = @board[[pos.first + slide_diff.first, pos.last + slide_diff.last]]
-      unless slide_move.nil?
-        moves << slide_move.position
+      x, y = [@position.first + slide_diff.first, @position.last + slide_diff.last]
+      slide_move = [x, y]
+
+      p slide_move
+
+      if (x.between?(0, 10) && y.between?(0, 9)) && @board[slide_move].nil?
+        moves << slide_move
+      else
       end
     end
+    p "Possible slides for #{@position}: "
+    p "#{moves.uniq}"
 
-    move_jump_diffs.each do |jump_diff|
-      jump_move = @board[[pos.first + jump_diff.first, pos.last + jump_diff.last]]
-      unless jump_move.nil?
-        p jump_move.position
-        moves << jump_move.position
-      end
-    end
-
-    moves
+    moves.uniq
   end
 
-  def remove_jumped_piece(starting_pos, ending_pos)
+  def remove_jumped_piece(start_pos, end_pos)
+    first = end_pos.first > start_pos.first ? 1 : -1
+    last = end_pos[1].to_i > start_pos[1].to_i ? 1 : -1
+    jumped_pos = [end_pos[0] - first, end_pos[1] - last]
 
-  end
-
-  def valid_move?(to_pos)
-    if @board[to_pos].nil?
-      # need to check jumped over for color @board[to_pos].color != color
-      if possible_moves(@position).include?(to_pos)
-        return true
-      end
-    end
-
-    return true
+    p "#{jumped_pos} has been removed"
+    @board[jumped_pos] = nil
   end
 end
