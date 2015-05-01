@@ -1,5 +1,5 @@
-# require_relative 'keypress'
 require_relative 'checker_board'
+# require_relative 'keypress'
 
 class Game
   attr_reader :white_player, :red_player, :current_player
@@ -35,11 +35,7 @@ class Player
 
   def make_move
     puts "Would you like to jump or slide? "
-    kind_of_move = gets.chomp.downcase
-    puts "Where would you like to move to? ("x y")"
-    move_to = gets.chomp.split(' ')
-    p move_to
-    return [kind_of_move, move_to]
+    input = gets.chomp
   end
 end
 
