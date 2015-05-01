@@ -1,6 +1,6 @@
 require_relative 'checker_board'
 require 'colorize'
-require 'byebug'
+# require 'byebug'
 
 class Piece
   attr_reader :color, :position, :king
