@@ -70,14 +70,12 @@ class Piece
       x, y = [@position.first + jump_diff.first, @position.last + jump_diff.last]
       jump_move = [x, y]
 
-      p jump_move
-
       if (x.between?(0, 10) && y.between?(0, 9)) && @board[jump_move].nil?
         moves << jump_move
       end
     end
-    p "Possible jumps for #{@position}: "
-    p "#{moves.uniq}"
+    # p "Possible jumps for #{@position}: "
+    # p "#{moves.uniq}"
 
     moves.uniq
   end
@@ -89,15 +87,13 @@ class Piece
       x, y = [@position.first + slide_diff.first, @position.last + slide_diff.last]
       slide_move = [x, y]
 
-      p slide_move
-
       if (x.between?(0, 10) && y.between?(0, 9)) && @board[slide_move].nil?
         moves << slide_move
       else
       end
     end
-    p "Possible slides for #{@position}: "
-    p "#{moves.uniq}"
+    # p "Possible slides for #{@position}: "
+    # p "#{moves.uniq}"
 
     moves.uniq
   end
