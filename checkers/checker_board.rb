@@ -1,4 +1,5 @@
 require_relative 'piece'
+require_relative 'keypress'
 
 class CheckerBoard
   attr_accessor :cursor
@@ -34,6 +35,7 @@ class CheckerBoard
           color = row < 5 ? :red : :white
           if (row + col) % 2 != 0
             self[[row, col]] = Piece.new([row, col], color, self)
+            # Add reference to a players total colection of pieces
             if self[[row, col]].color == :white
               self.white_pieces << self[[row, col]]
             else
@@ -42,6 +44,49 @@ class CheckerBoard
           end
         end
       end
+    end
+  end
+
+  def move_cursor
+
+    seq = []
+    # until seq[-2..-1] == ["r", "r"]
+      # input = @board.move_cursor
+      # if input == "r"
+        # seq << input
+      # end
+    # end
+    # p seq
+    loop do
+      input = read_char
+      x, y = @cursor
+
+      case input
+      when "\r"
+        return @cursor
+      when "\e[A"
+        if (x - 1).between?(0, 9) && (y).between?(0,9)
+          self.cursor = [x - 1, y]
+        end
+      when "\e[B"
+        if (x + 1).between?(0, 9) && (y).between?(0,9)
+          self.cursor = [x + 1, y]
+        end
+      when "\e[C"
+        if (x).between?(0, 9) && (y + 1).between?(0,9)
+          self.cursor = [x, y + 1]
+        end
+      when "\e[D"
+        if (x).between?(0, 9) && (y - 1).between?(0,9)
+          self.cursor = [x, y - 1]
+        end
+      when "\u0003"
+        puts "Game over"
+        exit 0
+      end
+
+      system "clear"
+      render
     end
   end
 
@@ -55,13 +100,24 @@ class CheckerBoard
       (0..9).each do |col|
         if (row + col) % 2 != 0
           if self[[row, col]].nil?
-            print "   ".colorize(:background => :blue)
+            if [row, col] == cursor
+              print "   ".colorize(:background => :yellow)
+            else
+              print "   ".colorize(:background => :blue)
+            end
           else
-            print " O ".colorize(:color => "#{self[[row, col]].color}".to_sym,
-                                 :background => :blue)
+            if [row, col] == cursor
+              print " O ".colorize(:color => "#{self[[row, col]].color}".to_sym,
+                                   :background => :yellow)
+            else
+              print " O ".colorize(:color => "#{self[[row, col]].color}".to_sym,
+                                   :background => :blue)
+            end
           end
         else
-          if self[[row, col]].nil?
+          if [row, col] == cursor
+            print "   ".colorize(:background => :yellow)
+          elsif self[[row, col]].nil?
             print "   "
           else
             print " O ".colorize(:color => "#{self[[row, col]].color}".to_sym)
