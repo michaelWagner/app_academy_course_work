@@ -1,5 +1,5 @@
 require_relative 'checker_board'
-# require_relative 'keypress'
+require_relative 'keypress'
 
 class Game
   attr_reader :white_player, :red_player, :current_player
@@ -21,8 +21,8 @@ class Game
 
   def play
     system 'clear'
+    @board.render
     until game_over?
-      @board.render
       @current_player.make_move
       update_current_player
     end
@@ -53,33 +53,54 @@ class Player
     moves
   end
 
+  def jump_move?(from_pos, to_pos)
+    from_x, from_y = from_pos
+    to_x, to_y = to_pos
+
+    return (from_x - to_x).abs == 2 && (from_y - to_y).abs == 2
+  end
+
   def make_move
-    puts "Enter the piece you would like to move \"[x, y]\": "
-    puts "Would you like to jump or slide? "
-    puts "Enter where you'd like to move the piece \"[x, y]\": "
-
-    from_pos, action, to_pos = gets.chomp.split(' ')
-
-    from_pos = [from_pos[1].to_i, from_pos[3].to_i]
-    to_pos = [to_pos[1].to_i, to_pos[3].to_i]
-
-    # p from_pos, action, to_pos
-
-    if action == 'j'
-      @board[from_pos].perform_jump(to_pos)
-    elsif action == 's'
-      @board[from_pos].perform_slide(to_pos)
-    else
-      raise "Invalid action"
+    # puts "Enter the piece you would like to move \"[x, y]\": "
+    # puts "Would you like to jump or slide? "
+    # puts "Enter where you'd like to move the piece \"[x, y]\": "
+    seq = []
+    last_pos = [-1, -1]
+    until seq.count > 1 && seq[-2] == last_pos
+      last_pos = @board.move_cursor
+      seq << last_pos
     end
 
+    seq = seq[0...-1]
+
+    p "sequence: #{seq}"
+
+    # if seq.count == 2
+      from_pos = seq.shift
+      until seq.empty?
+        to_pos = seq.shift
+        p "from_pos: #{from_pos}"
+        p "to_pos: #{to_pos}"
+
+        p move(from_pos, to_pos)
+        from_pos = to_pos
+
+      end
+
     system 'clear'
+    @board.render
+  end
+
+  def move(from_pos, to_pos)
+    # p to_pos.count
+    # to_pos.each do
+
+    jump_move?(from_pos, to_pos) ? @board[from_pos].perform_jump(to_pos) :
+                                   @board[from_pos].perform_slide(to_pos)
   end
 end
 
 if __FILE__ == $PROGRAM_NAME
-  # p1 = Player.new(:white)
-  # p2 = Player.new(:red)
 
   game = Game.new
   game.play
