@@ -22,22 +22,35 @@ class Game
   def play
     system 'clear'
     @board.render
+    puts "Welcome to checkers!"
+    puts "Please use the cursor to first select a piece "
+    puts "and then select where to place it."
+    puts "It is the red player's turn."
     until game_over?
-      @current_player.make_move
+      begin
+        @current_player.make_move
+      rescue
+        puts "Invalid"
+        retry
+      end
       update_current_player
     end
   end
 
   def update_current_player
     if @current_player == @white_player
+      puts "It is the red player's turn."
       @current_player = @red_player
     else
+      puts "It is the white player's turn."
       @current_player = @white_player
     end
   end
 end
 
 class Player
+  attr_reader :color
+
   def initialize(color, board)
     @color = color
     @board = board
@@ -69,6 +82,9 @@ class Player
     until seq.count > 1 && seq[-2] == last_pos
       last_pos = @board.move_cursor
       seq << last_pos
+      if @board[seq[0]].color != color
+        raise "Please move your own piece."
+      end
     end
 
     seq = seq[0...-1]
