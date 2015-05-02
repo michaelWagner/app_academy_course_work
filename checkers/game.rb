@@ -2,7 +2,8 @@ require_relative 'checker_board'
 require_relative 'keypress'
 
 class Game
-  attr_reader :white_player, :red_player, :current_player
+  attr_reader :board, :white_player, :red_player
+  attr_accessor :current_player
 
   def initialize
     @board = CheckerBoard.new
@@ -12,25 +13,23 @@ class Game
   end
 
   def game_over?
-    # when a player has no more pieces or no moves available game is over.
-    # puts "@white_player.available_moves: #{@white_player.available_moves.count}"
-    # puts "@red_player.available_moves: #{@red_player.available_moves.count}"
-
     return @white_player.available_moves.count <= 0 || @red_player.available_moves.count <= 0
   end
 
   def play
     system 'clear'
-    @board.render
+    board.render
+
     puts "Welcome to checkers!"
     puts "Please use the cursor to first select a piece "
     puts "and then select where to place it."
     puts "It is the red player's turn."
+
     until game_over?
       begin
-        @current_player.make_move
+        current_player.make_move
       rescue
-        puts "Invalid"
+        puts "Invalid move, please try again"
         retry
       end
       update_current_player
@@ -74,9 +73,6 @@ class Player
   end
 
   def make_move
-    # puts "Enter the piece you would like to move \"[x, y]\": "
-    # puts "Would you like to jump or slide? "
-    # puts "Enter where you'd like to move the piece \"[x, y]\": "
     seq = []
     last_pos = [-1, -1]
     until seq.count > 1 && seq[-2] == last_pos
@@ -91,16 +87,11 @@ class Player
 
     p "sequence: #{seq}"
 
-    # if seq.count == 2
       from_pos = seq.shift
       until seq.empty?
         to_pos = seq.shift
-        p "from_pos: #{from_pos}"
-        p "to_pos: #{to_pos}"
-
-        p move(from_pos, to_pos)
+        move(from_pos, to_pos)
         from_pos = to_pos
-
       end
 
     system 'clear'
@@ -108,9 +99,6 @@ class Player
   end
 
   def move(from_pos, to_pos)
-    # p to_pos.count
-    # to_pos.each do
-
     jump_move?(from_pos, to_pos) ? @board[from_pos].perform_jump(to_pos) :
                                    @board[from_pos].perform_slide(to_pos)
   end
