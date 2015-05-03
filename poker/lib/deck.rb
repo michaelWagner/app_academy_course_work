@@ -35,7 +35,7 @@ class Deck
 
   def return(cards)
     @deck << cards
-    @deck.flatten
+    @deck.flatten!
   end
 
 
