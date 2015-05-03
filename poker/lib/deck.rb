@@ -37,6 +37,4 @@ class Deck
     @deck << cards
     @deck.flatten!
   end
-
-
 end
