@@ -87,12 +87,12 @@ class Player
 
     p "sequence: #{seq}"
 
-      from_pos = seq.shift
-      until seq.empty?
-        to_pos = seq.shift
-        move(from_pos, to_pos)
-        from_pos = to_pos
-      end
+    from_pos = seq.shift
+    until seq.empty?
+      to_pos = seq.shift
+      move(from_pos, to_pos)
+      from_pos = to_pos
+    end
 
     system 'clear'
     @board.render
