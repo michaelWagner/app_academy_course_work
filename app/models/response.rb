@@ -12,6 +12,7 @@
 
 class Response < ActiveRecord::Base
   validates :respondent_id, :answer_id, :text, presence: true
+  validate :respondent_has_not_already_answered_question
 
   belongs_to(
     :respondent,
@@ -27,11 +28,7 @@ class Response < ActiveRecord::Base
     primary_key: :id
   )
 
-  has_many(
-    :sibling_responses,
-    through: :answer,
-    source: :responses
-  )
+
 
   has_one(
     :question,
@@ -39,5 +36,16 @@ class Response < ActiveRecord::Base
     source: :question
   )
 
+  def sister_responses
+    self.question.responses.where("(:id IS NULL) OR (responses.id != :id)", id: id)
+  end
+
+  def respondent_has_not_already_answered_question
+    sister_responses.each do |resp|
+      if resp.respondent_id == self.respondent_id
+        errors[:respondent_id] << "You have already answered the question!"
+      end
+    end
+  end
 
 end

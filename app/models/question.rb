@@ -32,4 +32,28 @@ class Question < ActiveRecord::Base
     source: :responses
   )
 
+  def results
+
+    answers
+      .select("answer_choices.*, COUNT(responses.answer_id) AS count")
+      .joins("JOIN responses ON responses.answer_id = answer_choices.id")
+      .joins("LEFT OUTER JOIN questions ON answer_choices.question_id = questions.id")
+      .where("questions.id = ?", self.id)
+      .group("answer_choices.id")
+
+    # SELECT
+    #   answer_choices.*, COUNT(responses.answer_id)
+    # FROM
+    #   answer_choices
+    # JOIN
+    #   responses ON responses.answer_id = answer_choices.id
+    # JOIN
+    #   questions ON answer_choices.question_id = questions.id
+    # WHERE
+    #   questions.id = self.id
+    # GROUP BY
+    #   answer_choices.id
+
+  end
+
 end
