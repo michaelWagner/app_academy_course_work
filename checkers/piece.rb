@@ -1,9 +1,9 @@
 require_relative 'checker_board'
 require 'colorize'
-# require 'byebug'
 
 class Piece
-  attr_reader :color, :position, :king
+  attr_reader :color
+  attr_accessor :position, :king
 
   def initialize(position, color, board)
     @position = position
@@ -12,8 +12,12 @@ class Piece
     @king = false
   end
 
+  def king?
+    @king
+  end
+
   def maybe_promote
-    if color == :white && @position[0] == 0
+    if color == :white && position[0] == 0
       @king = true
     elsif @position[0] == 9
       @king = true
@@ -28,9 +32,9 @@ class Piece
   end
 
   def move_jump_diffs
-    if @king
+    if king?
       [[2, 2], [2, -2], [-2, 2], [-2, -2]]
-    elsif @color == :red
+    elsif color == :red
       [[2, 2], [2, -2]]
     else
       [[-2, 2], [-2, -2]]
@@ -38,7 +42,7 @@ class Piece
   end
 
   def move_slide_diffs
-    if @king
+    if king?
       [[1, 1], [1, -1], [-1, 1], [-1, -1]]
     elsif @color == :red
       [[1, 1], [1, -1]]
@@ -51,16 +55,16 @@ class Piece
     if possible_slides.include?(slide_to)
       move!(slide_to)
     else
-      raise "Invalid Slide"
+      raise "Invalid move"
     end
   end
 
   def perform_jump(jump_to)
-    if possible_jumps.include?(jump_to)
+    if possible_jumps.include?(jump_to) # and not jumping over own color
       remove_jumped_piece(@position, jump_to)
       move!(jump_to)
     else
-      raise "Invalid Jump"
+      raise "Invalid move"
     end
   end
 
@@ -70,12 +74,10 @@ class Piece
       x, y = [@position.first + jump_diff.first, @position.last + jump_diff.last]
       jump_move = [x, y]
 
-      if (x.between?(0, 10) && y.between?(0, 9)) && @board[jump_move].nil?
+      if (x.between?(0, 9) && y.between?(0, 9)) && @board[jump_move].nil?
         moves << jump_move
       end
     end
-    # p "Possible jumps for #{@position}: "
-    # p "#{moves.uniq}"
 
     moves.uniq
   end
@@ -87,13 +89,11 @@ class Piece
       x, y = [@position.first + slide_diff.first, @position.last + slide_diff.last]
       slide_move = [x, y]
 
-      if (x.between?(0, 10) && y.between?(0, 9)) && @board[slide_move].nil?
+      if (x.between?(0, 9) && y.between?(0, 9)) && @board[slide_move].nil?
         moves << slide_move
       else
       end
     end
-    # p "Possible slides for #{@position}: "
-    # p "#{moves.uniq}"
 
     moves.uniq
   end
