@@ -48,7 +48,7 @@ def delete_user
   puts RestClient.delete(url)
 end
 
-# p create_user
+p create_user
 ####################################################################################
 ####################################################################################
 
@@ -136,11 +136,11 @@ def destroy_contact_share
   puts RestClient.delete(url)
 end
 
-# p create_contact_share
+p create_contact_share
 # p destroy_contact_share
 
-p index_contact
-# p create_contact
+# p index_contact
+p create_contact
 # p show_contact
 # p update_contact
 # p delete_contact
