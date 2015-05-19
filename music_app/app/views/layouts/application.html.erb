@@ -8,6 +8,16 @@
 </head>
 <body>
 
+<%= current_user %>
+<% if current_user %>
+  <h1>
+    <%= "Hello  #{current_user.email}!"%>
+  </h1>
+  <%= button_to "Log Out", session_url(current_user.id), method: :delete %>
+<% else %>
+  <%= "Please log in!" %>
+<% end %>
+
 <%= yield %>
 
 </body>

@@ -1,0 +1,34 @@
+<h1>Add a new record to the discography</h1>
+
+<form action="<%= albums_url %>" method="post">
+
+  <input type="hidden" name="authenticity_token"
+         value="<%= form_authenticity_token %>">
+
+  <label for="album_title">Album Title</label>
+    <input type="text" name="album[title]" value="<%= @album.title %>">
+
+  <label for="album_band_id">Band Name</label>
+
+    <select name="album[band_id]">
+      <% @bands.each do |band|  %>
+        <option name="album[band_id]"
+                value="<%= band.id %>"><%= band.name %></option>
+                <% @album.band_id = band.id %>
+      <% end %>
+    </select>
+
+  <br>
+  <br>
+
+  <label for="album_live_or_studio"></label>
+    <input type="radio" name="album[live_or_studio]"
+           id="album_live_or_studio"
+          value="live">Live recording<br>
+    <input type="radio" name="album[live_or_studio]"
+           id="album_live_or_studio"
+          value="studio">Studio recording<br>
+
+  <br>
+  <input type="submit" value="Add album">
+</form>

@@ -1,4 +1,4 @@
-<h1>Sign Up!</h1>
+<h1>Log in</h1>
 
 <ul>
   <% if flash[:errors] %>
@@ -8,7 +8,7 @@
   <% end %>
 </ul>
 
-<form action="<%= users_url %>" method="post">
+<form action="<%= session_url %>" method="post">
   <input type="hidden" name="authenticity_token"
          value="<%= form_authenticity_token %>">
 

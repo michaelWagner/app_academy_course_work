@@ -1,0 +1,7 @@
+<h1><%= @track.song_name %> is a hot track</h1>
+
+<% @album = Album.find(@track.album_id) %>
+<%= link_to "<< #{@album.title}" %>
+
+<%= button_to "Edit song", edit_track_url(@track) %>
+<%= button_to "Delete song", track_url(@track), method: :delete %>

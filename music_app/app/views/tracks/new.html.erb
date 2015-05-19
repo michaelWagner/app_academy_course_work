@@ -1,0 +1,32 @@
+<h1>Add your hot new track!</h1>
+
+<form action="<%= tracks_url %>" method="post">
+  <input type="hidden" name="authenticity_token"
+         value="<%= form_authenticity_token %>">
+
+  <label for="track_song_name">Song Name</label>
+  <input type="text" name="track[song_name]"
+         id="track_song_name"
+         value="<%= @track.song_name %>">
+
+  <br>
+  <br>
+
+  <label for="track_bonus_or_regular"></label>
+  <input type="radio" name="track[bonus_or_regular]"
+         id="track_bonus_or_regular"
+         value="bonus">Bonus
+  <input type="radio" name="track[bonus_or_regular]"
+         id="track_bonus_or_regular"
+         value="regular">Regular
+
+  <br>
+  <br>
+
+  <label for="track_lyrics">Lyrics</label><br>
+    <textarea name="track[lyrics]" rows="8" cols="40"></textarea>
+
+  <br>
+
+  <input type="submit" value="Add track">
+</form>

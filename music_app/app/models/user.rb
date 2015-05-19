@@ -7,17 +7,17 @@ class User < ActiveRecord::Base
 
   after_initialize :generate_session_token
 
-  def generate_session_token
-    self.session_token ||= SecureRandom.urlsafe_base64
-  end
-
-  def find_by_credentials(email, password)
+  def self.find_by_credentials(email, password)
     user = User.find_by(email: email)
     if user && user.is_password?(password)
       user
     else
       nil
     end
+  end
+
+  def generate_session_token
+    self.session_token ||= SecureRandom.urlsafe_base64
   end
 
   def reset_session_token!
