@@ -3,12 +3,13 @@ require 'active_support/core_ext'
 require 'erb'
 require 'active_support/inflector'
 require_relative './session'
+require_relative './flash'
 require_relative './params'
 
 
 class ControllerBase
   attr_reader :req, :res
-  attr_reader :params
+  attr_reader :params, :session, :flash
   attr_accessor :already_built_response
 
   # Setup the controller
@@ -18,6 +19,7 @@ class ControllerBase
     @already_built_response = false
     @params = Params.new(req, route_params)
     @session = session
+    @flash = flash
   end
 
   # Helper method to alias @already_built_response
@@ -39,6 +41,7 @@ class ControllerBase
       self.res.status = 302
       @already_built_response = true
       @session.store_session(@res)
+      @flash.store_flash(@res)
     end
   end
 
@@ -53,6 +56,7 @@ class ControllerBase
       @res.content_type = content_type
       @res.body = content
       @session.store_session(@res)
+      @flash.store_flash(@res)
     end
   end
 
@@ -68,5 +72,9 @@ class ControllerBase
   # method exposing a `Session` object
   def session
     @session ||= Session.new(@req)
+  end
+
+  def flash
+    @flash ||= Flash.new(@req)
   end
 end
