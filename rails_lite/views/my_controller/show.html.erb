@@ -1,1 +1,20 @@
 <%= (1..10).to_a.join(", ") %>
+
+<br>
+<h3>A lovely link</h3>
+<%= link_to "Counting Show", "/cats/" %>
+
+<br>
+
+<h3>A beautiful button</h3>
+
+<%= button_to "Counting Show", "/cats", method: :new %>
+
+<% flash.now[:errors] = ["You have made an error"] %>
+
+<%= "And some errors" if flash.now[:errors] %>
+<ul>
+<% flash.now[:errors].each do |error| %>
+  <li><%= error %></li>
+<% end %>
+</ul>

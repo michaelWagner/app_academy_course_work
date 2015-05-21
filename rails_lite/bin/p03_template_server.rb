@@ -1,5 +1,6 @@
 require 'webrick'
 require_relative '../lib/controller_base'
+require_relative '../helpers/route_helper'
 
 # http://www.ruby-doc.org/stdlib-2.0/libdoc/webrick/rdoc/WEBrick.html
 # http://www.ruby-doc.org/stdlib-2.0/libdoc/webrick/rdoc/WEBrick/HTTPRequest.html

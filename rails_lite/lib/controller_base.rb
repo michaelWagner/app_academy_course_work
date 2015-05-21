@@ -5,9 +5,11 @@ require 'active_support/inflector'
 require_relative './session'
 require_relative './flash'
 require_relative './params'
+require_relative '../helpers/route_helper'
 
 
 class ControllerBase
+  include RouteHelper
   attr_reader :req, :res
   attr_reader :params, :session, :flash
   attr_accessor :already_built_response
