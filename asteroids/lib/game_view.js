@@ -2,7 +2,7 @@
   var Asteroids = this.Asteroids = (this.Asteroids || {});
 
 
-  Asteroids.GameView = function (game, ctx){
+  Asteroids.GameView = function (game, ctx) {
     this.game = game;
     this.ctx = ctx;
     this.bindKeyHandlers();

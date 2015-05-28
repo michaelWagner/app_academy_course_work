@@ -5,22 +5,21 @@
   //   window.Asteroids = {};
   // }
 
-  Asteroids.Game = function(){
+  Asteroids.Game = function() {
     // probably get these values from the html canvas tag.
-    this.DIM_X = 1400;
-    this.DIM_Y = 900;
+    this.DIM_X = document.getElementById("game-canvas").width;
+    this.DIM_Y = document.getElementById("game-canvas").height;
+    // this.DIM_X = 1400;
+    // this.DIM_Y = 900;
     this.NUM_ASTEROIDS = 10;
     this.asteroids = [];
     this.addAsteroids();
     this.ship = new Asteroids.Ship (this);
-  //  NUM_ASTEROIDS.times do addAsteroids
   };
 
   Asteroids.Game.prototype.addAsteroids = function() {
     for (var i = 0; i < this.NUM_ASTEROIDS; i++ ) {
       this.asteroids.push(new Asteroids.Asteroid(this.randomPos(), this));
-      // HOPE WE CALLED THAT THE RIGHT WAY
-      // THe alternative was Asteroids.Game.randomPos??
     }
   };
 
@@ -58,10 +57,6 @@
     if (movingObj.pos[1] > (this.DIM_Y + movingObj.radius)) {
       newPos[1] = movingObj.pos[1] - (this.DIM_Y + movingObj.radius);
     }
-    // newPos[0] = pos[0] < 0          ? pos[0] + this.DIM_X : pos[0];
-    // newPos[0] = pos[0] > this.DIM_X ? pos[0] - this.DIM_X : pos[0]; // DOn't woprk
-    // newPos[1] = pos[1] < 0          ? pos[1] + this.DIM_Y : pos[1];
-    // newPos[1] = pos[1] > this.DIM_Y ? pos[1] - this.DIM_Y : pos[1]; // ytesa
 
     return newPos;
   };

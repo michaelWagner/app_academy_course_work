@@ -4,7 +4,7 @@
   //   window.Asteroids = {};
   // }
 
-  Asteroids.MovingObject = function (pos, vel, radius, color, game){
+  Asteroids.MovingObject = function (pos, vel, radius, color, game) {
     this.pos = pos;
     this.vel = vel;
     this.radius = radius;
